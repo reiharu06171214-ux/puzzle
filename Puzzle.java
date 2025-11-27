@@ -43,7 +43,8 @@ class GameFrame extends JFrame implements MouseListener{
 		//画像の読み込み
 		DecimalFormat decimalFormat = new DecimalFormat("00");
 		for(int i = 1; i < GRID_X*GRID_Y; i++) {
-			tileImage[i] = new ImageIcon("./images/" + decimalFormat.format(i) + ".gif");
+			tileImage[i] = new ImageIcon("./images/" + decimalFormat.format(i) + ".png");
+
 			label1[i] = new JLabel(tileImage[i]);
 			
 			this.getContentPane().add(label1[i]);
@@ -66,49 +67,57 @@ class GameFrame extends JFrame implements MouseListener{
 	}
 	public void mouseClicked(MouseEvent e) {}
 	public void mousePressed(MouseEvent e) {
-		int clickTileX;
-		int clickTileY;
-		boolean blnRet;
-		
-		switch(gameFlg) {
-			case GAME_WAIT:
-				System.out.println("GAME START");
-				gameInit();
-				break;
-			case GAME_ING:
-			    //クリックされたマスを取得
-			    clickTileX = (int)((e.getX()) / GRID_WIDTH);
-			    clickTileY = (int)((e.getY()) / GRID_HEIGHT);
+	    int clickTileX;
+	    int clickTileY;
+	    boolean blnRet;
 
-			    //コマを移動させる
-			    GInfo.moveTile(clickTileX, clickTileY);
+	    switch (gameFlg) {
+	        case GAME_WAIT:
+	            System.out.println("GAME START");
+	            gameInit();
+	            break;
 
-			    //コマが整列したかどうかをチェック
-			    blnRet = GInfo.getGameClearFlg();
-			    if (blnRet == true) {
-			        gameFlg = GAME_WAIT;
-			        
-			        javax.swing.JOptionPane.showMessageDialog(
-			                this,              // 親ウィンドウ
-			                "クリアおめでとう！！🎉",  // メッセージ
-			                "クリア！",                 // タイトル
-			                javax.swing.JOptionPane.INFORMATION_MESSAGE
-			            );
-			        
-			        System.out.println("GAME CLEAR");
-			    }
-			    break;
-		}
-		//描画
-		for(int y = 0; y < GRID_Y; y++) {
-			for(int x = 0; x < GRID_X; x++) {
-				if(GInfo.getTileNum(x, y) != 0) {
-					label1[GInfo.getTileNum(x, y)].setBounds(x * GRID_WIDTH, y * GRID_HEIGHT, GRID_WIDTH, GRID_HEIGHT);
-				}
-			}
-		}
-		this.setVisible(true);	
+	        case GAME_ING:
+	            // クリックされたマスを取得
+	            clickTileX = (int)((e.getX()) / GRID_WIDTH);
+	            clickTileY = (int)((e.getY()) / GRID_HEIGHT);
+
+	            // コマを移動させる（中身だけ動く）
+	            GInfo.moveTile(clickTileX, clickTileY);
+
+	            // ★ まず先に画面の表示を更新する
+	            for (int y = 0; y < GRID_Y; y++) {
+	                for (int x = 0; x < GRID_X; x++) {
+	                    if (GInfo.getTileNum(x, y) != 0) {
+	                        label1[GInfo.getTileNum(x, y)].setBounds(
+	                            x * GRID_WIDTH,
+	                            y * GRID_HEIGHT,
+	                            GRID_WIDTH,
+	                            GRID_HEIGHT
+	                        );
+	                    }
+	                }
+	            }
+	            this.repaint();  // りぺいんと（画面を描き直してね、のお願い）
+
+	            // ★ そのあとで「クリアしてるか？」をチェック
+	            blnRet = GInfo.getGameClearFlg();
+	            if (blnRet == true) {
+	                gameFlg = GAME_WAIT;
+
+	                javax.swing.JOptionPane.showMessageDialog(
+	                    this,
+	                    "クリアおめでとう！！🎉",
+	                    "クリア！",
+	                    javax.swing.JOptionPane.INFORMATION_MESSAGE
+	                );
+
+	                System.out.println("GAME CLEAR");
+	            }
+	            break;
+	    }
 	}
+
 	public void mouseReleased(MouseEvent e) {}
 	public void mouseEntered(MouseEvent e) {}
 	public void mouseExited(MouseEvent e) {}
